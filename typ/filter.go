@@ -1,6 +1,7 @@
 package typ //import "go.iondynamics.net/helpdesk/typ"
 
 import (
+	"strings"
 	"time"
 )
 
@@ -31,6 +32,16 @@ func (vf *ValueFilter) Unset() {
 func (vf *ValueFilter) Get() interface{} {
 	return vf.value
 }
+
+func (vf *ValueFilter) Check(v interface{}) bool {
+	if !vf.IsSet() {
+		return true
+	}
+
+	return (vf.value == v) != vf.Complement
+}
+
+//
 
 type BoolFilter struct {
 	ValueFilter
@@ -91,4 +102,16 @@ func (sf *StringFilter) Set(v string) {
 
 func (sf *StringFilter) Get() string {
 	return sf.ValueFilter.Get().(string)
+}
+
+func (sf *StringFilter) Check(str string) bool {
+	if sf.Contains == false {
+		return sf.ValueFilter.Check(str)
+	}
+
+	if !sf.IsSet() {
+		return true
+	}
+
+	return strings.Contains(str, sf.Get()) != sf.Complement
 }

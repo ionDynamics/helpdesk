@@ -9,21 +9,30 @@ import (
 	"go.iondynamics.net/iDechoLog"
 	idl "go.iondynamics.net/iDlogger"
 
+	"go.iondynamics.net/helpdesk/persistence"
+	"go.iondynamics.net/helpdesk/persistence/backend"
+	"go.iondynamics.net/helpdesk/route"
 	"go.iondynamics.net/helpdesk/template"
 )
 
 func main() {
 	idl.Info("Starting...")
 
-	e := echo.New()
+	pp, err := backend.InitBolt("helpdesk.db")
+	if err != nil {
+		idl.Emerg(err)
+	}
+	persistence.Init(pp)
 
 	tpl, err := template.New()
 	if err != nil {
 		idl.Emerg(err)
 	}
-	e.SetRenderer(tpl)
 
+	e := echo.New()
+	e.SetRenderer(tpl)
 	e.Use(iDechoLog.New())
+	e.Use(nosurf.NewPure)
 
 	s := stats.New()
 	e.Use(s.Handler)
@@ -31,11 +40,8 @@ func main() {
 		return c.JSON(http.StatusOK, s.Data())
 	})
 
-	e.Use(nosurf.NewPure)
-
-	e.Get("/login", func(c *echo.Context) error {
-		return c.Render(http.StatusOK, "loginGet.tpl", nil)
-	})
+	route.Init(e)
 
 	e.Run(":3001")
+
 }

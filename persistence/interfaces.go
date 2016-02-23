@@ -31,27 +31,35 @@ type Note interface {
 	DelAttachment(ID typ.GUID, AttachmentID typ.GUID) error
 }
 
-type PersistenceProvider interface {
+type Provider interface {
 	UpsertUser(email string, u *typ.User) error
 	ReadUser(email string) (*typ.User, error)
-	DeleteUser(email string, u *typ.User) error
+	DeleteUser(email string) error
 	UserExists(email string) (bool, error)
-	GetUsers() ([]string, error)
+	GetUsers(filters []*typ.UserFilter) ([]*typ.User, error)
 
 	UpsertTicket(ID typ.GUID, t *typ.Ticket) error
 	ReadTicket(ID typ.GUID) (*typ.Ticket, error)
-	DeleteTicket(ID typ.GUID, t *typ.Ticket) error
+	DeleteTicket(ID typ.GUID) error
 	TicketExists(ID typ.GUID) (bool, error)
+	GetTickets(filters []*typ.TicketFilter) ([]*typ.Ticket, error)
 
 	UpsertNote(ID typ.GUID, n *typ.Note) error
 	ReadNote(ID typ.GUID) (*typ.Note, error)
-	DeleteNote(ID typ.GUID, n *typ.Note) error
+	DeleteNote(ID typ.GUID) error
 	NoteExists(ID typ.GUID) (bool, error)
+	GetNotes(filters []*typ.NoteFilter) ([]*typ.Note, error)
 
 	UpsertAttachment(ID typ.GUID, a *typ.Attachment) error
 	ReadAttachment(ID typ.GUID) (*typ.Attachment, error)
-	DeleteAttachment(ID typ.GUID, a *typ.Attachment) error
+	DeleteAttachment(ID typ.GUID) error
 	AttachmentExists(ID typ.GUID) (bool, error)
+	GetAttachments(filters []*typ.AttachmentFilter) ([]*typ.Attachment, error)
 
 	Close() error
+}
+
+type NotFoundError interface {
+	error
+	IsNotFoundError()
 }

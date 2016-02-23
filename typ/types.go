@@ -19,7 +19,7 @@ type Ticket struct {
 	ClientEmail   string
 	AssigneeEmail string
 	Subject       string
-	Notes         map[GUID]*Note
+	Notes         []GUID
 	State         State
 	Tags          []string
 }
@@ -29,7 +29,7 @@ type Note struct {
 	CreatorEmail string
 	Content      string
 	Internal     bool
-	Attachments  map[GUID]*Attachment
+	Attachments  []GUID
 	Timestamp    time.Time
 	History      map[time.Time]string
 }
